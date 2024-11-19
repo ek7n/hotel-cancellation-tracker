@@ -3,4 +3,4 @@ pandas
 plotly
 joblib
 numpy
-sklearn
+scikit-learn
