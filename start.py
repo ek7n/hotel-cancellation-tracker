@@ -6,7 +6,7 @@ import joblib
 
 # Load data and model
 df = pd.read_csv("df_to_viz.csv")
-model = joblib.load("rf_model_base.joblib")  # Replace with your actual model file path
+
 
 df = df[df["ADR"] != 5400]
 
@@ -111,66 +111,3 @@ with tab2:
     )
     st.plotly_chart(fig_corr, use_container_width=True)
 
-# --- Prediction Tab ---
-with tab3:
-    st.title("Hotel Booking Cancellation Prediction")
-
-    # Default values for numerical inputs
-    default_values = {
-        "LeadTime": 50,
-        "ArrivalDateWeekNumber": 20,
-        "ArrivalDateDayOfMonth": 15,
-        "StaysInWeekendNights": 1,
-        "StaysInWeekNights": 3,
-        "PreviousBookingsNotCanceled": 0,
-        "BookingChanges": 0,
-        "DaysInWaitingList": 0,
-        "ADR": 100,
-        "NEW_ADR_by_Adults": 50,
-        "NEW_ADR_by_Children": 30,
-        "NEW_ADR_by_LeadTime": 2,
-        "NEW_Weeknights_by_LeadTime": 1,
-    }
-
-    # Categorical variable mappings
-    meal_mapping = ["HB", "SC", "Rare", "FB"]
-    country_mapping = ["BRA", "DEU", "ESP", "FRA", "GBR", "ITA", "NLD", "PRT", "USA", "Rare"]
-    market_segment_mapping = ["Direct", "Groups", "Offline TA/TO", "Online TA", "Rare"]
-    distribution_channel_mapping = ["Direct", "TA/TO", "Rare", "Corporate"]
-
-    # Sidebar for inputs
-    st.sidebar.header("Input Features")
-
-    # Numerical inputs
-    inputs = {}
-    for feature, default in default_values.items():
-        inputs[feature] = st.sidebar.number_input(f"Input {feature}", value=default)
-
-    # Dropdowns for categorical inputs
-    inputs["Meal"] = st.sidebar.selectbox("Meal Plan", meal_mapping)
-    inputs["Country"] = st.sidebar.selectbox("Country", country_mapping)
-    inputs["MarketSegment"] = st.sidebar.selectbox("Market Segment", market_segment_mapping)
-    inputs["DistributionChannel"] = st.sidebar.selectbox("Distribution Channel", distribution_channel_mapping)
-
-    # Prepare data for prediction
-    def encode_inputs(inputs):
-        encoded = {}
-        for key in default_values.keys():
-            encoded[key] = [inputs[key]]
-        return pd.DataFrame(encoded)
-
-    input_data = encode_inputs(inputs)
-
-    # Align columns with the model
-    expected_features = model.feature_names_in_
-    input_data = input_data.reindex(columns=expected_features, fill_value=0)
-
-    # Prediction button
-    if st.sidebar.button("Predict"):
-        prediction = model.predict(input_data)
-        prediction_proba = model.predict_proba(input_data)
-
-        if prediction[0] == 1:
-            st.success(f"Prediction: Booking is LIKELY to be canceled.")
-        else:
-            st.success(f"Prediction: Booking is UNLIKELY to be canceled.")
