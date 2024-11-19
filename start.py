@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import joblib
-import numpy as np
+
 
 # Load data and model
 df = pd.read_csv("df_to_viz.csv")
